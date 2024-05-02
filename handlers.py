@@ -1,6 +1,7 @@
 from aiogram import Router, F
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
+from game import Player
 
 router = Router()  # [1]
 
@@ -10,6 +11,10 @@ async def start_handler(message: Message) -> None:
     await message.answer(f"Привет, {message.chat.first_name}! Этот бот поможет тебе узнать чуточку больше об истории"
                          f" страны в игровой форме. Для того чтобы узнать правила игры и "
                          f"список доступных команд введи /help.  ")
+    player = Player(_id=message.from_user.id)
+    player = players.create(player)
+
+
 
 
 @router.message(Command(commands=['help']))
@@ -27,3 +32,6 @@ async def help_handler(message: Message) -> None:
                          f"/cancel - отменить игру\n"
                          f"/stats - посмотреть статистику\n"
                          f"Для начала игры введите /play!")
+
+@router.message(Command(commands=['play']))
+async def play():
