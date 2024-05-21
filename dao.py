@@ -1,10 +1,8 @@
-import json
-import os
 from typing import List, Tuple
 
 from pymongo import ReplaceOne
 from pymongo.database import Database
-from game import HistoricalEvent, Player
+from models import HistoricalEvent, Player
 
 
 class ObjectNotExists(Exception):
@@ -29,13 +27,13 @@ class PlayerDao:
         self.collection = self.data_source['Players']
 
     def create(self, player: Player) -> Tuple[Player, bool]:
-        player_db = self.data_source.find_one({'_id': player._id})
+        player_db = self.collection.find_one({'_id': player._id})
         created = player_db is None
 
         if player_db:
             player = Player(**player_db)
         else:
-            self.data_source.insert_one(
+            self.collection.insert_one(
                 {
                     "_id": player._id,
                     "current_event": player.current_event,
@@ -44,10 +42,10 @@ class PlayerDao:
                     "score": player.score,
                 }
             )
-            return player, created
+        return player, created
 
     def get(self, player_id: int) -> Player:
-        player = self.data_source.find_one({"_id": player_id})
+        player = self.collection.find_one({"_id": player_id})
         if not player:
             raise ObjectNotExists(
                 f"Игрока с id {player_id} не существует."
@@ -64,11 +62,11 @@ class PlayerDao:
                 {
                     "current_event": player.current_event,
                     "guessed_events": player.guessed_events,
-                    "attempts": player.attempts,
+                    "attempts": 0,
                     "score": player.score,
                 },
-                upsert=True # указывает Mongodb создать документ если c таким _id нет
+                upsert=True,  # указывает Mongodb создать документ если c таким _id нет
             )
             for player in players
         ]
-        self.data_source.bulk_write(update_players) # метод Mongodb для пакетной(множественной) записи
+        self.collection.bulk_write(update_players)  # метод Mongodb для пакетной(множественной) записи
