@@ -62,3 +62,4 @@ class GuessGame:
             else:
                 return "Событие произошло позже.", None
 
+# sur and cancel commands
