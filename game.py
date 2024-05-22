@@ -62,4 +62,13 @@ class GuessGame:
             else:
                 return "Событие произошло позже.", None
 
-# sur and cancel commands
+    def surrender(self, player: Player) -> HistoricalEvent:
+        event = self.events[player.current_event]
+        player.current_event = None
+        player.score -= 5
+        self.players[player._id] = player
+        return event
+
+    def cancel(self, player: Player):
+        player.current_event = None
+        self.players[player._id] = player
